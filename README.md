@@ -25,5 +25,6 @@ const q_a = a.toQuire();
 const q_b = a.mulAdd(a, b.toPosit(Posit8));
 
 
-
 ```
+
+Tested against softposit implementation
