@@ -23,6 +23,7 @@ _ = a.add(a)
 // Quire
 const q_a = a.toQuire();
 const q_b = a.mulAdd(a, b.toPosit(Posit8));
+const d = q_b.toPosit();
 
 // booleans
 c.grEq(Posit17_5.fromFloat(f64, 10e3));
