@@ -24,6 +24,9 @@ _ = a.add(a)
 const q_a = a.toQuire();
 const q_b = a.mulAdd(a, b.toPosit(Posit8));
 
+// booleans
+c.grEq(Posit17_5.fromFloat(f64, 10e3));
+... eq, nEq, gr, grEq, le, leEq
 
 ```
 
