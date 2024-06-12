@@ -28,3 +28,4 @@ const q_b = a.mulAdd(a, b.toPosit(Posit8));
 ```
 
 Tested against softposit implementation
+https://gitlab.com/cerlane/SoftPosit
