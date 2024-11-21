@@ -8,7 +8,7 @@ const IntFittingRange = std.math.IntFittingRange;
 
 fn PackType(comptime TupleType: type) type {
     if (@bitSizeOf(TupleType) == 0) return u0;
-    const struct_def = @typeInfo(TupleType).Struct;
+    const struct_def = @typeInfo(TupleType).@"struct";
     var fields: [struct_def.fields.len]std.builtin.Type.StructField = undefined;
     for (struct_def.fields, 0..) |field, i| {
         fields[i] = field;
@@ -16,7 +16,7 @@ fn PackType(comptime TupleType: type) type {
         fields[i].is_comptime = false;
     }
     return @Type(.{
-        .Struct = .{
+        .@"struct" = .{
             .layout = .@"packed",
             .fields = &fields,
             .decls = &.{},
@@ -30,7 +30,7 @@ fn pack(tuple: anytype) PackType(@TypeOf(tuple)) {
         return @as(u0, 0);
     } else {
         var out: PackType(@TypeOf(tuple)) = undefined;
-        const fields = @typeInfo(@TypeOf(tuple)).Struct.fields;
+        const fields = @typeInfo(@TypeOf(tuple)).@"struct".fields;
         inline for (fields) |field| {
             @field(out, field.name) = @field(tuple, field.name);
         }
@@ -41,7 +41,7 @@ fn pack(tuple: anytype) PackType(@TypeOf(tuple)) {
 const Sign = enum { positive, negative };
 
 fn GetFloatStructure(comptime T: type) type {
-    std.debug.assert(@typeInfo(T) == .Float);
+    std.debug.assert(@typeInfo(T) == .float);
     const frac_bits = std.math.floatMantissaBits(T);
     return struct {
         const Fraction = Int(.unsigned, frac_bits);
@@ -57,7 +57,7 @@ fn decodeFloat(comptime T: type, x: T) union(enum) {
     inf,
     regular: GetFloatStructure(T),
 } {
-    std.debug.assert(@typeInfo(T) == .Float);
+    std.debug.assert(@typeInfo(T) == .float);
     if (std.math.isNan(x)) return .inf;
     if (x == 0) return .zero; //works for negative zero
     const FloatStructure = GetFloatStructure(T);
@@ -74,10 +74,10 @@ fn decodeFloat(comptime T: type, x: T) union(enum) {
 }
 
 fn encodeFloat(comptime Float: type, comptime T: type, comptime M: type, frac: T, exp: M, sign: Sign) Float {
-    std.debug.assert(@typeInfo(Float) == .Float);
-    std.debug.assert(@typeInfo(T) == .Int);
-    std.debug.assert(@typeInfo(T).Int.signedness == .unsigned);
-    std.debug.assert(@typeInfo(M) == .Int);
+    std.debug.assert(@typeInfo(Float) == .float);
+    std.debug.assert(@typeInfo(T) == .int);
+    std.debug.assert(@typeInfo(T).int.signedness == .unsigned);
+    std.debug.assert(@typeInfo(M) == .int);
     const FloatStructure = GetFloatStructure(Float);
     if (exp >= std.math.floatExponentMax(Float)) return std.math.floatMax(Float);
     if (exp < std.math.floatExponentMin(Float)) return std.math.floatMin(Float);
@@ -355,10 +355,10 @@ pub fn Posit(comptime nbit: comptime_int, comptime es: comptime_int) type {
         }
 
         pub fn encode(comptime T: type, comptime M: type, frac: T, exp: M, out_sign: Sign) Self {
-            std.debug.assert(@typeInfo(T) == .Int);
-            std.debug.assert(@typeInfo(M) == .Int);
-            std.debug.assert(@typeInfo(T).Int.signedness == .unsigned);
-            //std.debug.assert (@typeInfo(M).Int.signedness == .signed);
+            std.debug.assert(@typeInfo(T) == .int);
+            std.debug.assert(@typeInfo(M) == .int);
+            std.debug.assert(@typeInfo(T).int.signedness == .unsigned);
+            //std.debug.assert (@typeInfo(M).int.signedness == .signed);
             if (exp < -max_exponent) return if (out_sign == .positive) min_pos else min_pos.negate();
             if (exp >= max_exponent) return if (out_sign == .positive) max_pos else max_pos.negate();
             const out_exp: Exponent = @intCast(exp);
@@ -418,7 +418,7 @@ pub fn Posit(comptime nbit: comptime_int, comptime es: comptime_int) type {
         }
 
         pub fn toFloat(self: Self, comptime Float: type) Float {
-            std.debug.assert(@typeInfo(Float) == .Float);
+            std.debug.assert(@typeInfo(Float) == .float);
             return switch (self.decode()) {
                 .zero => 0,
                 .inf => std.math.nan(Float),
@@ -437,7 +437,7 @@ pub fn Posit(comptime nbit: comptime_int, comptime es: comptime_int) type {
         }
 
         pub fn fromInt(comptime T: type, x: T) Self {
-            std.debug.assert(@typeInfo(T) == .Int);
+            std.debug.assert(@typeInfo(T) == .int);
             if (x == 0) return zero;
             var abs_x = @abs(x);
             const exp = @bitSizeOf(@TypeOf(abs_x)) - 1 - @clz(abs_x);
@@ -447,7 +447,7 @@ pub fn Posit(comptime nbit: comptime_int, comptime es: comptime_int) type {
         }
 
         pub fn fromFloat(comptime T: type, x: T) Self {
-            std.debug.assert(@typeInfo(T) == .Float);
+            std.debug.assert(@typeInfo(T) == .float);
             return switch (decodeFloat(T, x)) {
                 .zero => zero,
                 .inf => inf,
@@ -718,9 +718,9 @@ pub fn Posit(comptime nbit: comptime_int, comptime es: comptime_int) type {
             }
             //doesn't correctly approximate
             pub fn encode(comptime T: type, comptime M: type, frac: T, exp: M, outSign: Sign) Quire {
-                std.debug.assert(@typeInfo(T) == .Int);
-                std.debug.assert(@typeInfo(T).Int.signedness == .unsigned);
-                std.debug.assert(@typeInfo(M) == .Int);
+                std.debug.assert(@typeInfo(T) == .int);
+                std.debug.assert(@typeInfo(T).int.signedness == .unsigned);
+                std.debug.assert(@typeInfo(M) == .int);
                 if (exp >= max_quire_exp) return if (outSign == .positive) max_quire else max_quire.negate();
                 if (exp < min_quire_exp) return if (outSign == .positive) min_quire else min_quire.negate();
                 const quire_exp: QuireExponent = @intCast(exp);
@@ -742,7 +742,7 @@ pub fn Posit(comptime nbit: comptime_int, comptime es: comptime_int) type {
             }
 
             pub fn toFloat(self: Quire, comptime Float: type) Float {
-                std.debug.assert(@typeInfo(Float) == .Float);
+                std.debug.assert(@typeInfo(Float) == .float);
                 return switch (self.decode()) {
                     .zero => 0,
                     .inf => std.math.nan(Float),
@@ -770,7 +770,7 @@ pub fn Posit(comptime nbit: comptime_int, comptime es: comptime_int) type {
             }
 
             pub fn fromInt(comptime T: type, x: T) Quire {
-                std.debug.assert(@typeInfo(T) == .Int);
+                std.debug.assert(@typeInfo(T) == .int);
                 if (x == 0) return zero;
                 var abs_x = @abs(x);
                 const exp = @bitSizeOf(@TypeOf(abs_x)) - 1 - @clz(abs_x);
@@ -780,7 +780,7 @@ pub fn Posit(comptime nbit: comptime_int, comptime es: comptime_int) type {
             }
 
             pub fn fromFloat(comptime T: type, x: T) Quire {
-                std.debug.assert(@typeInfo(T) == .Float);
+                std.debug.assert(@typeInfo(T) == .float);
                 return switch (decodeFloat(T, x)) {
                     .zero => zero_quire,
                     .inf => inf_quire,
@@ -870,9 +870,9 @@ pub fn Posit(comptime nbit: comptime_int, comptime es: comptime_int) type {
 fn IntCeil(comptime T: type) type {
     const bitSizes = [_]comptime_int{ 8, 16, 32, 64, 128 };
     const size = @bitSizeOf(T);
-    const signedness = @typeInfo(T).Int.signedness;
+    const signedness = @typeInfo(T).int.signedness;
     for (bitSizes) |b| {
-        if (b >= size) return std.meta.Int(signedness, b);
+        if (b >= size) return std.meta.int(signedness, b);
     }
     return T;
 }
@@ -897,5 +897,20 @@ fn rootNInt(comptime T: type, value: T, comptime n: comptime_int) RootN(T, n) {
 }
 
 fn RootN(comptime T: type, comptime n: T) type {
-    return std.meta.Int(.unsigned, (@bitSizeOf(T) + n - 1) / n);
+    return std.meta.int(.unsigned, (@bitSizeOf(T) + n - 1) / n);
+}
+
+
+test "1-1 = 0" {
+    const bit_sizes = [_]usize{ 8, 32, 32, 64 };
+    const es_sizes = [_]usize{ 2, 3, 4 };
+    inline for (bit_sizes) |bitSize| {
+        inline for (es_sizes) |esSize| {
+            const PositType = Posit(bitSize, esSize);
+            const one = PositType.one;
+            const zero = PositType.zero;
+            const sub = one.sub(one);
+            try std.testing.expect(sub.eq(zero));
+        }
+    }
 }
