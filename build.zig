@@ -9,7 +9,7 @@ pub fn build(b: *std.Build) void {
     });
     
     const unit_tests = b.addTest(.{
-        .root_source_file = b.path("src/posit.zig"), //.{ .path = "src/main.zig" },
+        .root_source_file = b.path("src/posit.zig"),
         .target = target,
         .optimize = optimize,
     });

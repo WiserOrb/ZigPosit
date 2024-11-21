@@ -897,7 +897,7 @@ fn rootNInt(comptime T: type, value: T, comptime n: comptime_int) RootN(T, n) {
 }
 
 fn RootN(comptime T: type, comptime n: T) type {
-    return std.meta.int(.unsigned, (@bitSizeOf(T) + n - 1) / n);
+    return std.meta.Int(.unsigned, (@bitSizeOf(T) + n - 1) / n);
 }
 
 
