@@ -1,5 +1,5 @@
 .{
-    .name = "zigposit",
+    .name = "posit",
     .version = "0.0.1",
     .dependencies = .{},
     .paths = .{
