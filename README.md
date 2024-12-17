@@ -3,7 +3,7 @@
 A pure zig posit implementation for generic bitlen and es values, even odd ones
 
 ```zig
-const Posit = @import("zigposit").Posit;
+const Posit = @import("posit").Posit;
 
 // Type definitions
 const Posit8 = Posit(8, 2);
