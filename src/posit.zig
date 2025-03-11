@@ -428,8 +428,8 @@ pub fn Posit(comptime nbit: comptime_int, comptime es: comptime_int) type {
             };
         }
 
-        pub fn fromPosit(x: T) Self {
-            
+        pub fn fromPosit(x: anytype) Self {
+            const T = @TypoOf(x);
             return switch (x.decode()) {
                 .zero => zero,
                 .inf => inf,
