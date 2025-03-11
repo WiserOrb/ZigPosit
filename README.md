@@ -17,7 +17,7 @@ const c = Posit17_5.fromPosit(Posit32, b);
 
 // aritmetics
 _ = a.add(a)
-... sub, mul, div, sqrt,sqrtN, fMM, 
+... sub, mul, div, sqrt,rootN, fMM, 
 
 
 // Quire
