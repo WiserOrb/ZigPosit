@@ -429,7 +429,7 @@ pub fn Posit(comptime nbit: comptime_int, comptime es: comptime_int) type {
         }
 
         pub fn fromPosit(x: anytype) Self {
-            const T = @TypoOf(x);
+            const T = @TypeOf(x);
             return switch (x.decode()) {
                 .zero => zero,
                 .inf => inf,
@@ -914,4 +914,15 @@ test "1-1 = 0" {
             try std.testing.expect(sub.eq(zero));
         }
     }
+}
+
+test "conversions" {
+    const Posit8 = Posit(8, 2);
+    const Posit16 = Posit(16, 2);
+    
+    const a8: Posit8 = .fromFloat(f64, 3);
+    const a16: Posit16 = .fromFloat(f64, 3);
+    const b16: Posit16 = .fromPosit(a8);
+    
+    try std.testing.expect(b16.eq(a16));
 }

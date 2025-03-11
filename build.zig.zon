@@ -1,6 +1,7 @@
 .{
-    .name = "posit",
-    .version = "0.0.1",
+    .name = .posit,
+    .version = "0.0.2",
+    .fingerprint = 0xe9554345974ec834,
     .dependencies = .{},
     .paths = .{
         "build.zig",
